@@ -10,6 +10,7 @@ using Musify.Resources;
 using System.IO.IsolatedStorage;
 using Musify.Models;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Musify
 {
@@ -67,8 +68,13 @@ namespace Musify
                     List<MusicInfo> music = new List<MusicInfo>();
                     music.Add(new MusicInfo { Name = "Bleeding Out.mp3", Owner = "Krishna Chaitanya" });
                     music.Add(new MusicInfo { Name = "My Fault.mp3", Owner = "Lakshman" });
-                    music.Add(new MusicInfo { Name = "Akash.m4a", Owner = "Lakshman" });
+                    music.Add(new MusicInfo { Name = "Akash.m4a", Owner = "Akash" });
                     db.MusicInfo.InsertAllOnSubmit<MusicInfo>(music);
+                    List<RouteTable> route1 = new List<RouteTable>();
+                    route1.Add(new RouteTable() { DisplayName = "Krishna Chaitanya", RouteId = 1, Order = 1 });
+                    route1.Add(new RouteTable() { DisplayName = "Lakshman", RouteId = 1, Order = 2 });
+                    route1.Add(new RouteTable() { DisplayName = "Akash", RouteId = 1, Order = 3 });
+                    db.RouteTable.InsertAllOnSubmit<RouteTable>(route1);
                     db.SubmitChanges();
                 }
             }

@@ -79,7 +79,7 @@ namespace Musify.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to MY APPLICATION.
+        ///   Looks up a localized string similar to Musify.
         /// </summary>
         public static string ApplicationTitle {
             get {
@@ -93,24 +93,6 @@ namespace Musify.Resources {
         public static string ApplicationTitle1 {
             get {
                 return ResourceManager.GetString("ApplicationTitle1", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Enter Chat Name:.
-        /// </summary>
-        public static string ChatNamePrompt {
-            get {
-                return ResourceManager.GetString("ChatNamePrompt", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Connect to selected (start chatting).
-        /// </summary>
-        public static string ConnectButtonCaption {
-            get {
-                return ResourceManager.GetString("ConnectButtonCaption", resourceCulture);
             }
         }
         
@@ -151,7 +133,7 @@ namespace Musify.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Please enter a chat name to join..
+        ///   Looks up a localized string similar to Please enter a your name to connect..
         /// </summary>
         public static string Err_NoChatName {
             get {
@@ -160,7 +142,7 @@ namespace Musify.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Chat name is empty.
+        ///   Looks up a localized string similar to Your name is empty.
         /// </summary>
         public static string Err_NoChatNameCaption {
             get {
@@ -174,24 +156,6 @@ namespace Musify.Resources {
         public static string Err_NoConnectTitle {
             get {
                 return ResourceManager.GetString("Err_NoConnectTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Please enter a message to send..
-        /// </summary>
-        public static string Err_NoMessageToSend {
-            get {
-                return ResourceManager.GetString("Err_NoMessageToSend", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to You must select a peer from the list..
-        /// </summary>
-        public static string Err_NoPeer {
-            get {
-                return ResourceManager.GetString("Err_NoPeer", resourceCulture);
             }
         }
         
@@ -214,20 +178,11 @@ namespace Musify.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You are currently not advertising yourself, i.e., a call to PeerFinder.Start() must proceed FindAllPeersAsync().
+        ///   Looks up a localized string similar to You are currently not advertising yourself..
         /// </summary>
         public static string Err_NotAdvertising {
             get {
                 return ResourceManager.GetString("Err_NotAdvertising", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Refresh peers.
-        /// </summary>
-        public static string FindButtonCaption {
-            get {
-                return ResourceManager.GetString("FindButtonCaption", resourceCulture);
             }
         }
         
@@ -280,65 +235,11 @@ namespace Musify.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Chat Ended.
-        /// </summary>
-        public static string Msg_ChatEnded {
-            get {
-                return ResourceManager.GetString("Msg_ChatEnded", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Do you want to chat with {0}?.
-        /// </summary>
-        public static string Msg_ChatPrompt {
-            get {
-                return ResourceManager.GetString("Msg_ChatPrompt", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Incoming Chat Request.
-        /// </summary>
-        public static string Msg_ChatPromptTitle {
-            get {
-                return ResourceManager.GetString("Msg_ChatPromptTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Joined Conversation.
-        /// </summary>
-        public static string Msg_ChatStarted {
-            get {
-                return ResourceManager.GetString("Msg_ChatStarted", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Connected to {0}!.
         /// </summary>
         public static string Msg_ConnectedTo {
             get {
                 return ResourceManager.GetString("Msg_ConnectedTo", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Peers found: {0}. Tap &apos;refresh peers&apos; to update..
-        /// </summary>
-        public static string Msg_FoundPeers {
-            get {
-                return ResourceManager.GetString("Msg_FoundPeers", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to No peers found. Tap &apos;refresh peers&apos; to update..
-        /// </summary>
-        public static string Msg_NoPeers {
-            get {
-                return ResourceManager.GetString("Msg_NoPeers", resourceCulture);
             }
         }
         

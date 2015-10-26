@@ -126,7 +126,7 @@
     <comment>Controls the Language and ensures that the font for all elements in the RootFrame aligns with the app's language. Set to the language code of this resource file's language.</comment>
   </data>
   <data name="ApplicationTitle" xml:space="preserve">
-    <value>MY APPLICATION</value>
+    <value>Musify</value>
   </data>
   <data name="AppBarButtonText" xml:space="preserve">
     <value>add</value>
@@ -136,12 +136,6 @@
   </data>
   <data name="ApplicationTitle1" xml:space="preserve">
     <value>Musify</value>
-  </data>
-  <data name="ChatNamePrompt" xml:space="preserve">
-    <value>Enter Chat Name:</value>
-  </data>
-  <data name="ConnectButtonCaption" xml:space="preserve">
-    <value>Connect to selected (start chatting)</value>
   </data>
   <data name="DisplayNameCaption" xml:space="preserve">
     <value>Display Name:</value>
@@ -156,19 +150,13 @@
     <value>To run this app, you must have ID_CAP_PROXIMITY enabled in WMAppManifest.xaml</value>
   </data>
   <data name="Err_NoChatName" xml:space="preserve">
-    <value>Please enter a chat name to join.</value>
+    <value>Please enter a your name to connect.</value>
   </data>
   <data name="Err_NoChatNameCaption" xml:space="preserve">
-    <value>Chat name is empty</value>
+    <value>Your name is empty</value>
   </data>
   <data name="Err_NoConnectTitle" xml:space="preserve">
     <value>Can't connect</value>
-  </data>
-  <data name="Err_NoMessageToSend" xml:space="preserve">
-    <value>Please enter a message to send.</value>
-  </data>
-  <data name="Err_NoPeer" xml:space="preserve">
-    <value>You must select a peer from the list.</value>
   </data>
   <data name="Err_NoPeerConnected" xml:space="preserve">
     <value>You are not connected to a Peer.</value>
@@ -177,10 +165,7 @@
     <value>Can't send</value>
   </data>
   <data name="Err_NotAdvertising" xml:space="preserve">
-    <value>You are currently not advertising yourself, i.e., a call to PeerFinder.Start() must proceed FindAllPeersAsync()</value>
-  </data>
-  <data name="FindButtonCaption" xml:space="preserve">
-    <value>Refresh peers</value>
+    <value>You are currently not advertising yourself.</value>
   </data>
   <data name="Format_IncomingMessageNoName" xml:space="preserve">
     <value>&lt;--  {0}
@@ -200,26 +185,8 @@
   <data name="JoinPageTitle" xml:space="preserve">
     <value>join chat</value>
   </data>
-  <data name="Msg_ChatEnded" xml:space="preserve">
-    <value>Chat Ended</value>
-  </data>
-  <data name="Msg_ChatPrompt" xml:space="preserve">
-    <value>Do you want to chat with {0}?</value>
-  </data>
-  <data name="Msg_ChatPromptTitle" xml:space="preserve">
-    <value>Incoming Chat Request</value>
-  </data>
-  <data name="Msg_ChatStarted" xml:space="preserve">
-    <value>Joined Conversation</value>
-  </data>
   <data name="Msg_ConnectedTo" xml:space="preserve">
     <value>Connected to {0}!</value>
-  </data>
-  <data name="Msg_FoundPeers" xml:space="preserve">
-    <value>Peers found: {0}. Tap 'refresh peers' to update.</value>
-  </data>
-  <data name="Msg_NoPeers" xml:space="preserve">
-    <value>No peers found. Tap 'refresh peers' to update.</value>
   </data>
   <data name="PageTitle1" xml:space="preserve">
     <value>page name</value>

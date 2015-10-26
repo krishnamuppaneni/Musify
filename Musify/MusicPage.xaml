@@ -29,8 +29,8 @@
         <!--ContentPanel - place additional content here-->
         <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
             <MediaElement x:Name="media"/>
-            <ListBox x:Name="musicList" ItemsSource="{Binding}" FontFamily="Portable User Interface" SelectionChanged="musicList_SelectionChanged">
-                <ListBox.ItemTemplate>
+            <phone:LongListSelector x:Name="musicList" ItemsSource="{Binding}" FontFamily="Portable User Interface" SelectionChanged="musicList_SelectionChanged">
+                <phone:LongListSelector.ItemTemplate>
                     <DataTemplate>
                         <Grid Margin="10">
                             <Grid.RowDefinitions>
@@ -41,8 +41,8 @@
                             <TextBlock Text="{Binding Owner}" Grid.Row="1"/>
                         </Grid>
                     </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+                </phone:LongListSelector.ItemTemplate>
+            </phone:LongListSelector>
         </Grid>
     </Grid>
 

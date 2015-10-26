@@ -14,5 +14,6 @@ namespace Musify.Models
 
         public Table<MusicInfo> MusicInfo;
         public Table<PeerInfo> PeerInfo;
+        public Table<RouteTable> RouteTable;
     }
 }
