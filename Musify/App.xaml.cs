@@ -1,16 +1,14 @@
-﻿using System;
+﻿using Microsoft.Phone.Controls;
+using Microsoft.Phone.Shell;
+using Musify.Models;
+using Musify.Resources;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using System.Resources;
+using System.IO.IsolatedStorage;
 using System.Windows;
 using System.Windows.Markup;
 using System.Windows.Navigation;
-using Microsoft.Phone.Controls;
-using Microsoft.Phone.Shell;
-using Musify.Resources;
-using System.IO.IsolatedStorage;
-using Musify.Models;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Musify
 {
@@ -66,9 +64,9 @@ namespace Musify
                     //Create the database
                     db.CreateDatabase();
                     List<MusicInfo> music = new List<MusicInfo>();
-                    music.Add(new MusicInfo { Name = "Bleeding Out.mp3", Owner = "Krishna Chaitanya" });
-                    music.Add(new MusicInfo { Name = "My Fault.mp3", Owner = "Lakshman" });
-                    music.Add(new MusicInfo { Name = "Akash.m4a", Owner = "Akash" });
+                    music.Add(new MusicInfo { Name = "Hallowen.mp3", Owner = "Krishna Chaitanya" });
+                    music.Add(new MusicInfo { Name = "Minion Ring.mp3", Owner = "Lakshman" });
+                    music.Add(new MusicInfo { Name = "Trap.mp3", Owner = "Akash" });
                     db.MusicInfo.InsertAllOnSubmit<MusicInfo>(music);
                     List<RouteTable> route1 = new List<RouteTable>();
                     route1.Add(new RouteTable() { DisplayName = "Krishna Chaitanya", RouteId = 1, Order = 1 });

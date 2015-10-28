@@ -1,28 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Navigation;
+﻿using Coding4Fun.Toolkit.Controls;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
-using Musify.Models;
-using Windows.Storage;
-using Coding4Fun.Toolkit.Controls;
-using System.Collections.ObjectModel;
-using Windows.Networking.Sockets;
-using Windows.Networking.Proximity;
 using Microsoft.Phone.Tasks;
+using Musify.Models;
 using Musify.Resources;
-using Windows.Storage.Streams;
-using System.Threading.Tasks;
-using System.Windows.Input;
+using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.IO.IsolatedStorage;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework;
+using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using Windows.Networking.Proximity;
+using Windows.Networking.Sockets;
+using Windows.Storage;
+using Windows.Storage.Streams;
 
 namespace Musify
 {
@@ -96,6 +91,8 @@ namespace Musify
 
         private async void musicList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (musicList.SelectedItem == null)
+                return;
             MusicInfo music = (MusicInfo)e.AddedItems[0];
             StorageFolder folder = KnownFolders.MusicLibrary;
             if (music.Owner == App.DisplayName)
@@ -108,6 +105,7 @@ namespace Musify
             {
                 RequestMusic(music);
             }
+            musicList.SelectedItem = null;
         }
 
         private async void RequestMusic(MusicInfo music)
@@ -116,7 +114,6 @@ namespace Musify
             {
                 StartProgress("finding peer...");
                 var peers = await PeerFinder.FindAllPeersAsync();
-
                 if (peers.Count == 0)
                 {
                     ShowToastMessage("No peers are available to connect.");
@@ -154,7 +151,7 @@ namespace Musify
                     {
                         using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())
                         {
-                            StartProgress("Getting music...");
+                            StartProgress("Getting music from " + _peerName + "...");
                             byte[] musicBytes = await SendMusicRequest(music, peer);
                             using (IsolatedStorageFileStream audio = new IsolatedStorageFileStream(music.Name, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite, isf))
                             {
@@ -185,9 +182,10 @@ namespace Musify
                 {
                     MessageBox.Show(AppResources.Err_NotAdvertising);
                 }
-                else
+                else if ((uint)ex.HResult == 0x80072750)
+
                 {
-                    MessageBox.Show(ex.Message);
+                    MessageBox.Show("The app on peer device is not running.");
                 }
             }
             finally
@@ -239,9 +237,8 @@ namespace Musify
                 _socket = await PeerFinder.ConnectAsync(peer);
                 _peerName = peer.DisplayName;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                MessageBox.Show(ex.Message);
                 CloseConnection(true);
             }
         }
@@ -275,13 +272,13 @@ namespace Musify
 
         private async void ListenForMusicRequest()
         {
-            StartProgress("Sending music...");
+            StartProgress("Sending music to "+_peerName+"...");
             try
             {
                 string music = await GetMusicRequest();
                 SendMusic(music);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 CloseConnection(true);
             }
@@ -321,8 +318,8 @@ namespace Musify
             }
             else
             {
-               byte[] musicBytes = await RequestMusicForPeer(musicInfo);
-                _dataWriter = new DataWriter(_socket.OutputStream);                            
+                byte[] musicBytes = await RequestMusicForPeer(musicInfo);
+                _dataWriter = new DataWriter(_socket.OutputStream);
                 _dataWriter.WriteInt32(musicBytes.Length);
                 await _dataWriter.StoreAsync();
                 _dataWriter.WriteBytes(musicBytes);
@@ -372,7 +369,7 @@ namespace Musify
                            .FirstOrDefault();
 
                     }
-                    StartProgress("Getting music...");
+                    StartProgress("Getting music from "+_peerName+"...");
                     byte[] musicBytes = await SendMusicRequestForPeer(music, peer);
                     return musicBytes;
                 }
