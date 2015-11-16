@@ -4,6 +4,9 @@ using Microsoft.Phone.Shell;
 using Microsoft.Phone.Tasks;
 using Musify.Models;
 using Musify.Resources;
+using SQLite;
+using SQLite.Net;
+using SQLite.Net.Platform.WindowsPhone8;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -63,9 +66,9 @@ namespace Musify
                 };
                 inputPrompt.Show();
             }
-            using (DatabaseContext db = new DatabaseContext(DatabaseContext.DBConnectionString))
+            using (var db = new SQLiteConnection(new SQLitePlatformWP8(), DatabaseHelper.DB_PATH))
             {
-                music = db.MusicInfo.ToList();
+                music = db.Table<MusicInfo>().ToList();
                 musicList.DataContext = music;
             }
 
@@ -95,7 +98,7 @@ namespace Musify
                 return;
             MusicInfo music = (MusicInfo)e.AddedItems[0];
             StorageFolder folder = KnownFolders.MusicLibrary;
-            if (music.Owner == App.DisplayName)
+            if (music.Owner.DisplayName == App.DisplayName)
             {
                 StorageFile file = await folder.GetFileAsync(music.Name);
                 media.Source = new Uri(file.Path);
@@ -125,14 +128,14 @@ namespace Musify
                     int routeId;
                     int sourceOrderId;
                     int destinationOrderId;
-                    using (DatabaseContext db = new DatabaseContext(DatabaseContext.DBConnectionString))
+                    using (var db = new SQLiteConnection(new SQLitePlatformWP8(),DatabaseHelper.DB_PATH))
                     {
-                        routes = db.RouteTable.ToList();
+                        routes = db.Table<RouteTable>().ToList();
                     }
-                    routeId = routes.Where(r1 => r1.DisplayName == App.DisplayName && routes.Where(r2 => r2.DisplayName == music.Owner && r1.RouteId == r2.RouteId).Count() > 0)
+                    routeId = routes.Where(r1 => r1.DisplayName == App.DisplayName && routes.Where(r2 => r2.DisplayName == music.Owner.DisplayName && r1.RouteId == r2.RouteId).Count() > 0)
                             .Select(s => s.RouteId).FirstOrDefault();
                     sourceOrderId = routes.Where(r => r.DisplayName == App.DisplayName && r.RouteId == routeId).FirstOrDefault().Order;
-                    destinationOrderId = routes.Where(r => r.DisplayName == music.Owner && r.RouteId == routeId).FirstOrDefault().Order;
+                    destinationOrderId = routes.Where(r => r.DisplayName == music.Owner.DisplayName && r.RouteId == routeId).FirstOrDefault().Order;
 
                     if (sourceOrderId > destinationOrderId)
                     {
@@ -297,11 +300,11 @@ namespace Musify
         private async void SendMusic(string music)
         {
             MusicInfo musicInfo;
-            using (DatabaseContext db = new DatabaseContext(DatabaseContext.DBConnectionString))
+            using (var db = new SQLiteConnection(new SQLitePlatformWP8(), DatabaseHelper.DB_PATH))
             {
-                musicInfo = db.MusicInfo.Where(m => m.Name == music).FirstOrDefault();
+                musicInfo = db.Table<MusicInfo>().Where(m => m.Name == music).FirstOrDefault();
             }
-            if (musicInfo.Owner == App.DisplayName)
+            if (musicInfo.Owner.DisplayName == App.DisplayName)
             {
                 StorageFolder folder = KnownFolders.MusicLibrary;
                 StorageFile file = await folder.GetFileAsync(music);
@@ -347,14 +350,14 @@ namespace Musify
                     int routeId;
                     int sourceOrderId;
                     int destinationOrderId;
-                    using (DatabaseContext db = new DatabaseContext(DatabaseContext.DBConnectionString))
+                    using ( var db = new SQLiteConnection(new SQLitePlatformWP8(), DatabaseHelper.DB_PATH))
                     {
-                        routes = db.RouteTable.ToList();
+                        routes = db.Table<RouteTable>().ToList();
                     }
-                    routeId = routes.Where(r1 => r1.DisplayName == App.DisplayName && routes.Where(r2 => r2.DisplayName == music.Owner && r1.RouteId == r2.RouteId).Count() > 0)
+                    routeId = routes.Where(r1 => r1.DisplayName == App.DisplayName && routes.Where(r2 => r2.DisplayName == music.Owner.DisplayName && r1.RouteId == r2.RouteId).Count() > 0)
                             .Select(s => s.RouteId).FirstOrDefault();
                     sourceOrderId = routes.Where(r => r.DisplayName == App.DisplayName && r.RouteId == routeId).FirstOrDefault().Order;
-                    destinationOrderId = routes.Where(r => r.DisplayName == music.Owner && r.RouteId == routeId).FirstOrDefault().Order;
+                    destinationOrderId = routes.Where(r => r.DisplayName == music.Owner.DisplayName && r.RouteId == routeId).FirstOrDefault().Order;
 
                     if (sourceOrderId > destinationOrderId)
                     {

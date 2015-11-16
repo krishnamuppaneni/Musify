@@ -2,6 +2,7 @@
 using Microsoft.Phone.Shell;
 using Musify.Models;
 using Musify.Resources;
+using SQLite.Net.Platform.WindowsPhone8;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -57,25 +58,25 @@ namespace Musify
             InitializeLanguage();
 
             // Create the database if it does not exist.
-            using (DatabaseContext db = new DatabaseContext(DatabaseContext.DBConnectionString))
-            {
-                if (!db.DatabaseExists())
-                {
-                    //Create the database
-                    db.CreateDatabase();
-                    List<MusicInfo> music = new List<MusicInfo>();
-                    music.Add(new MusicInfo { Name = "Hallowen.mp3", Owner = "Krishna Chaitanya" });
-                    music.Add(new MusicInfo { Name = "Minion Ring.mp3", Owner = "Lakshman" });
-                    music.Add(new MusicInfo { Name = "Trap.mp3", Owner = "Akash" });
-                    db.MusicInfo.InsertAllOnSubmit<MusicInfo>(music);
-                    List<RouteTable> route1 = new List<RouteTable>();
-                    route1.Add(new RouteTable() { DisplayName = "Krishna Chaitanya", RouteId = 1, Order = 1 });
-                    route1.Add(new RouteTable() { DisplayName = "Lakshman", RouteId = 1, Order = 2 });
-                    route1.Add(new RouteTable() { DisplayName = "Akash", RouteId = 1, Order = 3 });
-                    db.RouteTable.InsertAllOnSubmit<RouteTable>(route1);
-                    db.SubmitChanges();
-                }
-            }
+            //using (DatabaseContext db = new DatabaseContext(DatabaseContext.DBConnectionString))
+            //{
+            //    if (!db.DatabaseExists())
+            //    {
+            //        //Create the database
+            //        db.CreateDatabase();
+            //        List<MusicInfo> music = new List<MusicInfo>();
+            //        music.Add(new MusicInfo { Name = "Hallowen.mp3", Owner = "Krishna Chaitanya" });
+            //        music.Add(new MusicInfo { Name = "Minion Ring.mp3", Owner = "Lakshman" });
+            //        music.Add(new MusicInfo { Name = "Trap.mp3", Owner = "Akash" });
+            //        db.MusicInfo.InsertAllOnSubmit<MusicInfo>(music);
+            //        List<RouteTable> route1 = new List<RouteTable>();
+            //        route1.Add(new RouteTable() { DisplayName = "Krishna Chaitanya", RouteId = 1, Order = 1 });
+            //        route1.Add(new RouteTable() { DisplayName = "Lakshman", RouteId = 1, Order = 2 });
+            //        route1.Add(new RouteTable() { DisplayName = "Akash", RouteId = 1, Order = 3 });
+            //        db.RouteTable.InsertAllOnSubmit<RouteTable>(route1);
+            //        db.SubmitChanges();
+            //    }
+            //}
 
 
             // Show graphics profiling information while debugging.
@@ -108,8 +109,10 @@ namespace Musify
 
         // Code to execute when the application is launching (eg, from Start)
         // This code will not execute when the application is reactivated
-        private void Application_Launching(object sender, LaunchingEventArgs e)
+        private async void Application_Launching(object sender, LaunchingEventArgs e)
         {
+            DatabaseHelper dbHelper = new DatabaseHelper();
+            await dbHelper.CreateDatabase();
         }
 
         // Code to execute when the application is activated (brought to foreground)

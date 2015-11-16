@@ -13,7 +13,7 @@
       <Capability Name="ID_CAP_MEDIALIB_PLAYBACK" />
     </Capabilities>
     <Tasks>
-      <DefaultTask Name="_default" NavigationPage="MusicPage.xaml" ActivationPolicy="Resume" />
+      <DefaultTask Name="_default" NavigationPage="TestPage.xaml" ActivationPolicy="Resume" />
     </Tasks>
     <Tokens>
       <PrimaryToken TokenID="MusifyToken" TaskName="_default">

@@ -1,17 +1,16 @@
-﻿using System.Data.Linq.Mapping;
+﻿using SQLite.Net.Attributes;
 
 namespace Musify.Models
 {
-    [Table]
     public class RouteTable
     {
-        [Column(IsPrimaryKey = true, CanBeNull = false, IsDbGenerated = true, DbType = "INT NOT NULL IDENTITY", AutoSync = AutoSync.OnInsert)]
+        [PrimaryKey]
         public int Id { get; set; }
-        [Column]
+      
         public int RouteId { get; set; }
-        [Column]
+
         public int Order { get; set; }
-        [Column]
+
         public string DisplayName { get; set; }
     }
 }

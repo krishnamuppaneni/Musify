@@ -1,15 +1,20 @@
-﻿using System.Data.Linq.Mapping;
+﻿using SQLite.Net.Attributes;
+using SQLiteNetExtensions.Attributes;
 
 namespace Musify.Models
 {
-    [Table]
+    [Table("MusicInfo")]
     public class MusicInfo
     {
-        [Column(IsPrimaryKey = true, IsDbGenerated = true, DbType = "INT NOT NULL IDENTITY", CanBeNull = false, AutoSync = AutoSync.OnInsert)]      
+        [PrimaryKey]      
         public int Id { get; set; }
-        [Column]
-        public string Name { get; set; }     
-        [Column] 
-        public string Owner { get; set; }
+
+        public string Name { get; set; }
+
+        [ForeignKey(typeof(Device))]
+        public int OwnerId { get; set; }
+
+        [OneToOne]
+        public Device Owner { get; set; }
     }
 }
