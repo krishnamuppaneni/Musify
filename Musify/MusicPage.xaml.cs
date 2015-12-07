@@ -101,6 +101,8 @@ namespace Musify
         private async void musicList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             outputText.Text = "Music selected";
+            musicList.Visibility = Visibility.Collapsed;
+            graph.Visibility = Visibility.Visible;
             if (musicList.SelectedItem == null)
                 return;
             MusicInfo music = (MusicInfo)e.AddedItems[0];
@@ -118,6 +120,8 @@ namespace Musify
                 outputText.Text = "Music is not owned by this device";
                 RequestMusic(music);
             }
+            graph.Visibility = Visibility.Collapsed;
+            musicList.Visibility = Visibility.Visible;            
             musicList.SelectedItem = null;
         }
 
@@ -150,14 +154,13 @@ namespace Musify
                         db.FindWithChildren<Device>(endDeviceId, recursive: true), 1);
                     sourceOrderId = routes.Count - 1;
                     destinationOrderId = sourceOrderId - 1;
-                    peer = peers.Where(p => p.DisplayName == routes[destinationOrderId].DisplayName).FirstOrDefault();
-                    outputText.Text = "Next device in route is " + peer.DisplayName;
+                    peer = peers.Where(p => p.DisplayName == routes[destinationOrderId].DisplayName).FirstOrDefault();                    
                     Device startDevice = db.FindWithChildren<Device>(startDeviceId, recursive: true);
                     Device endDevice = db.FindWithChildren<Device>(endDeviceId, recursive: true);
-                    outputText.Text = "Checking if device " + peer.DisplayName + " is available";
+                    outputText.Text = "Checking if device is available";
                     while (!await CheckExistance(peer))
                     {
-                        outputText.Text = "The device " + peer.DisplayName + " is not available. Calculating new route";
+                        outputText.Text = "The device is not available. Calculating new route";
                         startDevice.Connections.RemoveAll(d => d.FirstDeviceId == routes[destinationOrderId].Id || d.SecondDeviceId == routes[destinationOrderId].Id);
                         foreach (var connection in startDevice.Connections)
                         {
@@ -239,6 +242,7 @@ namespace Musify
             }
             catch (Exception)
             {
+                CloseConnection(true);
                 return false;
             }
             return true;
@@ -416,7 +420,7 @@ namespace Musify
                     destinationOrderId = sourceOrderId - 1;
                     peer = peers.Where(p => p.DisplayName == routes[destinationOrderId].DisplayName).FirstOrDefault(); Device startDevice = db.FindWithChildren<Device>(startDeviceId, recursive: true);
                     Device endDevice = db.FindWithChildren<Device>(endDeviceId, recursive: true);
-                   while (!await CheckExistance(peer))
+                   while (!await CheckExistancePeer(peer))
                     {
                         startDevice.Connections.RemoveAll(d => d.FirstDeviceId == routes[destinationOrderId].Id || d.SecondDeviceId == routes[destinationOrderId].Id);
                         foreach (var connection in startDevice.Connections)
@@ -482,29 +486,36 @@ namespace Musify
             return null;
         }
 
-        private async Task<byte[]> SendMusicRequestForPeer(MusicInfo music, PeerInformation peer)
+        private async Task<bool> CheckExistancePeer(PeerInformation peer)
         {
             try
             {
                 _socket1 = await PeerFinder.ConnectAsync(peer);
                 _peerName = peer.DisplayName;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                MessageBox.Show(ex.Message);
                 CloseConnection1();
+                return false;
             }
+            return true;
+        }
+
+        private async Task<byte[]> SendMusicRequestForPeer(MusicInfo music, PeerInformation peer)
+        {
             if (_socket == null)
             {
                 MessageBox.Show(AppResources.Err_NoPeerConnected, AppResources.Err_NoSendTitle, MessageBoxButton.OK);
                 return null;
             }
+            outputText.Text = "Sending music";
             _dataWriter1 = new DataWriter(_socket1.OutputStream);
             _dataWriter1.WriteInt32(music.Name.Length);
             await _dataWriter1.StoreAsync();
 
             _dataWriter1.WriteString(music.Name);
             await _dataWriter1.StoreAsync();
+            outputText.Text = "";
             return await GetMusicforPeer();
         }
 

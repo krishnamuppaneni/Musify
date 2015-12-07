@@ -40,7 +40,7 @@
                 <ComboBoxItem Content="Graph 1"  Tag="1" IsSelected="True"/>
                 <ComboBoxItem Content="Graph 2" Tag="2"/>
             </ComboBox>
-            <phone:LongListSelector Visibility="Collapsed" x:Name="musicList" ItemsSource="{Binding}" Grid.Row="1" FontFamily="Portable User Interface" SelectionChanged="musicList_SelectionChanged">
+            <phone:LongListSelector x:Name="musicList" ItemsSource="{Binding}" Grid.Row="1" FontFamily="Portable User Interface" SelectionChanged="musicList_SelectionChanged">
                 <phone:LongListSelector.ItemTemplate>
                     <DataTemplate>
                         <Grid Margin="10">
@@ -54,7 +54,7 @@
                     </DataTemplate>
                 </phone:LongListSelector.ItemTemplate>
             </phone:LongListSelector>
-            <Grid Grid.Row="1">
+            <Grid x:Name="graph" Visibility="Collapsed" Grid.Row="1">
                 <Ellipse Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="100" Margin="0,62,0,0" Grid.Row="1" Stroke="Black" VerticalAlignment="Top" Width="100"/>
                 <Ellipse Fill="#FFF4F4F5" Height="100" Margin="169,62,187,0" Stroke="Black" VerticalAlignment="Top"/>
                 <Ellipse Fill="#FFF4F4F5" HorizontalAlignment="Left" Margin="0,228,0,208" Stroke="Black" Width="100"/>
@@ -80,7 +80,7 @@
                 <TextBlock Text="D" Margin="215,263,-215,-263" Foreground="Black"/>
                 <TextBlock Text="E" Margin="388,184,-388,-184" Foreground="Black"/>
             </Grid>
-            <TextBlock x:Name="outputText" Grid.RowSpan="3" Text="Test" Foreground="White" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,20" FontSize="24"/>
+            <TextBlock x:Name="outputText" Grid.RowSpan="3" Text="Test" Foreground="White" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,20" FontSize="24" TextWrapping="Wrap"/>
 
         </Grid>
     </Grid>
