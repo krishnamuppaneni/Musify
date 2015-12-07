@@ -95,7 +95,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Algorithms\DFS.cs" />
+    <Compile Include="Algorithms\KruskalsAlgorithm.cs" />
+    <Compile Include="Algorithms\NetworkFlowAlgorithm.cs" />
     <Compile Include="Algorithms\ShortestDelay.cs" />
+    <Compile Include="Algorithms\UnionFind.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
