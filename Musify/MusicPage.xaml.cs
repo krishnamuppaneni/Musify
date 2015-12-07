@@ -23,6 +23,7 @@ using Windows.Networking.Proximity;
 using Windows.Networking.Sockets;
 using Windows.Storage;
 using Windows.Storage.Streams;
+using System.ComponentModel;
 
 namespace Musify
 {
@@ -43,12 +44,25 @@ namespace Musify
         DataReader _dataReader;
         DataWriter _dataWriter1;
         DataReader _dataReader1;
-        int routeId;
+        int routeId = 1;
 
         public MusicPage()
         {
             InitializeComponent();
             SystemTray.SetProgressIndicator(this, new ProgressIndicator());
+        }
+
+        protected override void OnBackKeyPress(CancelEventArgs e)
+        {
+            base.OnBackKeyPress(e);
+            if(graph1.Visibility == Visibility.Visible || graph1.Visibility == Visibility.Visible 
+                || musicList.Visibility == Visibility.Collapsed)
+            {
+                graph1.Visibility = Visibility.Collapsed;
+                graph2.Visibility = Visibility.Collapsed;
+                musicList.Visibility = Visibility.Visible;
+                e.Cancel = true;
+            }
         }
 
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
@@ -102,7 +116,10 @@ namespace Musify
         {
             outputText.Text = "Music selected";
             musicList.Visibility = Visibility.Collapsed;
-            graph.Visibility = Visibility.Visible;
+            if (routeId == 1)
+                graph1.Visibility = Visibility.Visible;
+            else
+                graph2.Visibility = Visibility.Visible;
             if (musicList.SelectedItem == null)
                 return;
             MusicInfo music = (MusicInfo)e.AddedItems[0];
@@ -120,8 +137,9 @@ namespace Musify
                 outputText.Text = "Music is not owned by this device";
                 RequestMusic(music);
             }
-            graph.Visibility = Visibility.Collapsed;
-            musicList.Visibility = Visibility.Visible;            
+            graph1.Visibility = Visibility.Collapsed;
+            graph2.Visibility = Visibility.Collapsed;
+            musicList.Visibility = Visibility.Visible;
             musicList.SelectedItem = null;
         }
 
@@ -139,7 +157,7 @@ namespace Musify
                 }
                 else
                 {
-                    List<Device> routes;
+
                     PeerInformation peer;
                     int sourceOrderId;
                     int destinationOrderId;
@@ -150,34 +168,34 @@ namespace Musify
                     int endDeviceId = db.Table<Device>()
                         .Where(d => d.Id == music.OwnerId).FirstOrDefault().Id;
                     outputText.Text = "Finding route using shortest path algorithm";
-                    routes = shortestDelay.FindMinDelayPath(db.FindWithChildren<Device>(startDeviceId, recursive: true),
-                        db.FindWithChildren<Device>(endDeviceId, recursive: true), 1);
-                    sourceOrderId = routes.Count - 1;
+                    App.Routes = shortestDelay.FindMinDelayPath(db.FindWithChildren<Device>(startDeviceId, recursive: true),
+                        db.FindWithChildren<Device>(endDeviceId, recursive: true), routeId);
+                    sourceOrderId = App.Routes.Count - 1;
                     destinationOrderId = sourceOrderId - 1;
-                    peer = peers.Where(p => p.DisplayName == routes[destinationOrderId].DisplayName).FirstOrDefault();                    
+                    peer = peers.Where(p => p.DisplayName == App.Routes[destinationOrderId].DisplayName).FirstOrDefault();
                     Device startDevice = db.FindWithChildren<Device>(startDeviceId, recursive: true);
                     Device endDevice = db.FindWithChildren<Device>(endDeviceId, recursive: true);
                     outputText.Text = "Checking if device is available";
                     while (!await CheckExistance(peer))
                     {
                         outputText.Text = "The device is not available. Calculating new route";
-                        startDevice.Connections.RemoveAll(d => d.FirstDeviceId == routes[destinationOrderId].Id || d.SecondDeviceId == routes[destinationOrderId].Id);
+                        startDevice.Connections.RemoveAll(d => d.FirstDeviceId == App.Routes[destinationOrderId].Id || d.SecondDeviceId == App.Routes[destinationOrderId].Id);
                         foreach (var connection in startDevice.Connections)
                         {
-                            connection.FirstDevice.Connections.RemoveAll(d => d.FirstDeviceId == routes[destinationOrderId].Id || d.SecondDeviceId == routes[destinationOrderId].Id);
-                            connection.SecondDevice.Connections.RemoveAll(d => d.FirstDeviceId == routes[destinationOrderId].Id || d.SecondDeviceId == routes[destinationOrderId].Id);
+                            connection.FirstDevice.Connections.RemoveAll(d => d.FirstDeviceId == App.Routes[destinationOrderId].Id || d.SecondDeviceId == App.Routes[destinationOrderId].Id);
+                            connection.SecondDevice.Connections.RemoveAll(d => d.FirstDeviceId == App.Routes[destinationOrderId].Id || d.SecondDeviceId == App.Routes[destinationOrderId].Id);
                         }
-                        endDevice.Connections.RemoveAll(d => d.FirstDeviceId == routes[destinationOrderId].Id || d.SecondDeviceId == routes[destinationOrderId].Id);
+                        endDevice.Connections.RemoveAll(d => d.FirstDeviceId == App.Routes[destinationOrderId].Id || d.SecondDeviceId == App.Routes[destinationOrderId].Id);
                         foreach (var connection in endDevice.Connections)
                         {
-                            connection.FirstDevice.Connections.RemoveAll(d => d.FirstDeviceId == routes[destinationOrderId].Id || d.SecondDeviceId == routes[destinationOrderId].Id);
-                            connection.SecondDevice.Connections.RemoveAll(d => d.FirstDeviceId == routes[destinationOrderId].Id || d.SecondDeviceId == routes[destinationOrderId].Id);
+                            connection.FirstDevice.Connections.RemoveAll(d => d.FirstDeviceId == App.Routes[destinationOrderId].Id || d.SecondDeviceId == App.Routes[destinationOrderId].Id);
+                            connection.SecondDevice.Connections.RemoveAll(d => d.FirstDeviceId == App.Routes[destinationOrderId].Id || d.SecondDeviceId == App.Routes[destinationOrderId].Id);
                         }
 
-                        routes = shortestDelay.FindMinDelayPath(startDevice, endDevice, 1);
-                        sourceOrderId = routes.Count - 1;
+                        App.Routes = shortestDelay.FindMinDelayPath(startDevice, endDevice, routeId);
+                        sourceOrderId = App.Routes.Count - 1;
                         destinationOrderId = sourceOrderId - 1;
-                        peer = peers.Where(p => p.DisplayName == routes[destinationOrderId].DisplayName).FirstOrDefault();
+                        peer = peers.Where(p => p.DisplayName == App.Routes[destinationOrderId].DisplayName).FirstOrDefault();
                     }
                     if (peer != null)
                     {
@@ -415,12 +433,12 @@ namespace Musify
                     int endDeviceId = db.Table<Device>()
                         .Where(d => d.Id == music.OwnerId).FirstOrDefault().Id;
                     routes = shortestDelay.FindMinDelayPath(db.FindWithChildren<Device>(startDeviceId, recursive: true),
-                        db.FindWithChildren<Device>(endDeviceId, recursive: true), 1);
+                        db.FindWithChildren<Device>(endDeviceId, recursive: true), routeId);
                     sourceOrderId = routes.Count - 1;
                     destinationOrderId = sourceOrderId - 1;
                     peer = peers.Where(p => p.DisplayName == routes[destinationOrderId].DisplayName).FirstOrDefault(); Device startDevice = db.FindWithChildren<Device>(startDeviceId, recursive: true);
                     Device endDevice = db.FindWithChildren<Device>(endDeviceId, recursive: true);
-                   while (!await CheckExistancePeer(peer))
+                    while (!await CheckExistancePeer(peer))
                     {
                         startDevice.Connections.RemoveAll(d => d.FirstDeviceId == routes[destinationOrderId].Id || d.SecondDeviceId == routes[destinationOrderId].Id);
                         foreach (var connection in startDevice.Connections)
@@ -435,7 +453,7 @@ namespace Musify
                             connection.SecondDevice.Connections.RemoveAll(d => d.FirstDeviceId == routes[destinationOrderId].Id || d.SecondDeviceId == routes[destinationOrderId].Id);
                         }
 
-                        routes = shortestDelay.FindMinDelayPath(startDevice, endDevice, 1);
+                        routes = shortestDelay.FindMinDelayPath(startDevice, endDevice, routeId);
                         sourceOrderId = routes.Count - 1;
                         destinationOrderId = sourceOrderId - 1;
                         peer = peers.Where(p => p.DisplayName == routes[destinationOrderId].DisplayName).FirstOrDefault();
@@ -457,7 +475,7 @@ namespace Musify
                 {
                     MessageBox.Show("There is no path between source and destination due to inactive devices");
                 }
-                else if((uint)ex.HResult == ERR_BLUETOOTH_OFF)
+                else if ((uint)ex.HResult == ERR_BLUETOOTH_OFF)
                 {
                     var result = MessageBox.Show(AppResources.Err_BluetoothOff, AppResources.Err_BluetoothOffCaption, MessageBoxButton.OKCancel);
                     if (result == MessageBoxResult.OK)
@@ -613,6 +631,18 @@ namespace Musify
             ConnectionSettingsTask connectionSettingsTask = new ConnectionSettingsTask();
             connectionSettingsTask.ConnectionSettingsType = ConnectionSettingsType.Bluetooth;
             connectionSettingsTask.Show();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            NavigationService.Navigate(new Uri("/OutPage.xaml", UriKind.RelativeOrAbsolute));
+        }
+
+        private void ListPicker_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (graphPicker == null)
+                return;
+            routeId = graphPicker.SelectedIndex + 1;
         }
     }
 

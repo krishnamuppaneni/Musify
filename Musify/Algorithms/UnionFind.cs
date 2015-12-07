@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace AlgosProject
+namespace Musify.Algorithms
 {
     class UnionFind
     {
-        static void Main(string[] args)
+        public string output;
+
+        public string Run()
         {
             try
             {
@@ -31,19 +33,19 @@ namespace AlgosProject
                 PrintElementSets(sets);
                 sets.Union(sets.FindSet(7), sets.FindSet(11));
                 PrintElementSets(sets);
-                Console.ReadKey();
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.StackTrace);         
+                //Console.WriteLine(e.StackTrace);
             }
+            return output;
         }
 
-        static void PrintElementSets(DisjointSets sets)
+        public void PrintElementSets(DisjointSets sets)
         {
             for (int i = 0; i < sets.ElementCount; ++i)
-                Console.Write(sets.FindSet(i).ToString() + "  ");
-            Console.WriteLine();
+                output += sets.FindSet(i).ToString() + "  ";
+            output += "\n";
         }
     }
 

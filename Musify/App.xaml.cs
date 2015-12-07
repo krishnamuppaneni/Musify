@@ -15,6 +15,7 @@ namespace Musify
 {
     public partial class App : Application
     {
+        public static List<Device> Routes = new List<Device>();
         public static string DisplayName
         {
             get

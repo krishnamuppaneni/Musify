@@ -64,18 +64,14 @@ namespace Musify.Models
                         };
                         List<Connection> connections2 = new List<Connection>()
                         {
-                             new Connection() { FirstDeviceId=1, SecondDeviceId=2, Delay=3 },
-                             new Connection() { FirstDeviceId=2, SecondDeviceId=1, Delay=3 },
-                             new Connection() { FirstDeviceId=1, SecondDeviceId=3, Delay=4 },
-                             new Connection() { FirstDeviceId=3, SecondDeviceId=1, Delay=4 },
-                             new Connection() { FirstDeviceId=3, SecondDeviceId=4, Delay=2 },
-                             new Connection() { FirstDeviceId=4, SecondDeviceId=3, Delay=1 },
+                             new Connection() { FirstDeviceId=1, SecondDeviceId=2, Delay=2 },
+                             new Connection() { FirstDeviceId=2, SecondDeviceId=1, Delay=2 },
                              new Connection() { FirstDeviceId=2, SecondDeviceId=4, Delay=2 },
                              new Connection() { FirstDeviceId=4, SecondDeviceId=2, Delay=2 },
                              new Connection() { FirstDeviceId=2, SecondDeviceId=5, Delay=4 },
                              new Connection() { FirstDeviceId=5, SecondDeviceId=2, Delay=4 },
-                             new Connection() { FirstDeviceId=4, SecondDeviceId=5, Delay=3 },
-                             new Connection() { FirstDeviceId=5, SecondDeviceId=4, Delay=3 },
+                             new Connection() { FirstDeviceId=4, SecondDeviceId=5, Delay=1 },
+                             new Connection() { FirstDeviceId=5, SecondDeviceId=4, Delay=1 },
                         };
                         List<RouteTable> routes = new List<RouteTable>()
                         {

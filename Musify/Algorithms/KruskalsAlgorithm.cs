@@ -3,53 +3,49 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace AlgosProject
+namespace Musify.Algorithms
 {
     class KruskalsAlgorithm
     {
-        static void Main()
+        public string output;
+
+        public string Run()
         {
             Adjacency adjacency = new Adjacency(9);
 
-            adjacency.setElementAt(true, 0, 1);
-            adjacency.setElementAt(true, 0, 7);
             adjacency.setElementAt(true, 1, 2);
-            adjacency.setElementAt(true, 1, 7);
-            adjacency.setElementAt(true, 2, 3);
-            adjacency.setElementAt(true, 2, 5);
-            adjacency.setElementAt(true, 2, 8);
+            adjacency.setElementAt(true, 2, 1);
+            adjacency.setElementAt(true, 1, 3);
+            adjacency.setElementAt(true, 3, 1);
             adjacency.setElementAt(true, 3, 4);
-            adjacency.setElementAt(true, 3, 5);
+            adjacency.setElementAt(true, 4, 3);
             adjacency.setElementAt(true, 4, 5);
-            adjacency.setElementAt(true, 5, 6);
-            adjacency.setElementAt(true, 6, 7);
-            adjacency.setElementAt(true, 6, 8);
-            adjacency.setElementAt(true, 7, 8);
-            adjacency.setWeight(0, 1, 4);
-            adjacency.setWeight(0, 7, 8);
-            adjacency.setWeight(1, 2, 8);
-            adjacency.setWeight(1, 7, 11);
-            adjacency.setWeight(2, 3, 7);
+            adjacency.setElementAt(true, 5, 4);
+            adjacency.setElementAt(true, 5, 2);
+            adjacency.setElementAt(true, 2, 5);
+            adjacency.setElementAt(true, 4, 2);
+            adjacency.setElementAt(true, 2, 4);
+            adjacency.setWeight(1, 2, 2);
+            adjacency.setWeight(2, 1, 2);
+            adjacency.setWeight(1, 3, 1);
+            adjacency.setWeight(3, 1, 1);
+            adjacency.setWeight(3, 4, 1);
+            adjacency.setWeight(4, 3, 1);
+            adjacency.setWeight(4, 5, 1);
+            adjacency.setWeight(5, 4, 1);
+            adjacency.setWeight(5, 2, 4);
             adjacency.setWeight(2, 5, 4);
-            adjacency.setWeight(2, 8, 2);
-            adjacency.setWeight(3, 4, 9);
-            adjacency.setWeight(3, 5, 14);
-            adjacency.setWeight(4, 5, 10);
-            adjacency.setWeight(5, 6, 2);
-            adjacency.setWeight(6, 7, 1);
-            adjacency.setWeight(6, 8, 6);
-            adjacency.setWeight(7, 8, 7);
+            adjacency.setWeight(4, 2, 2);
+            adjacency.setWeight(2, 4, 2);
 
             KruskalsAlgorithm mst = new KruskalsAlgorithm();
             Pair[] A = mst.MSTKruskal(9, adjacency);
 
-            Console.WriteLine("The edges of the minimum spanning tree:\r\n\r\n");
+            output += "The edges of the minimum spanning tree:\r\n\r\n";
             for (int i = 0; i < A.Length; i++)
                 if (A[i] != null)
-                    Console.WriteLine(A[i].ToString() + "\r\n");
-                    //textBox1.Text += A[i].ToString() + "\r\n"; 
-
-            Console.ReadLine();
+                    output += A[i].ToString() + "\r\n";
+            return output;
         }
 
         int ALength;

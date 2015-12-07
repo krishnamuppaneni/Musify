@@ -1,9 +1,10 @@
+using Musify;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace AlgosProject
+namespace Musify.Algorithms
 {
     public class NetworkFlowAlgorithm
     {
@@ -15,13 +16,6 @@ namespace AlgosProject
         {
             Nodes = new Dictionary<int, Node>();
             Edges = new Dictionary<string, Edge>();
-        }
-
-        public static void Main(string[] args)
-        {
-            new NetworkFlowAlgorithm().Run();
-            PrintLn("Press key to exit ...");
-            Console.ReadKey();
         }
 
         void ParseData()
@@ -47,10 +41,11 @@ namespace AlgosProject
             }
         }
 
-        public void Run()
+        public string Run()
         {
             ParseData();
             Algo();
+            return output;
         }
 
         void Algo()
@@ -66,7 +61,7 @@ namespace AlgosProject
 
         void FordFulkersonAlgo(Node nodeSource, Node nodeTerminal)
         {
-            PrintLn("\n** NetworkFlowAlgorithm");
+            PrintLn("\n** Network Flow Algorithm");
             var flow = 0f;
 
             var path = Bfs(nodeSource, nodeTerminal);
@@ -90,10 +85,10 @@ namespace AlgosProject
             }
 
             // max flow
-            PrintLn("\n** Max flow = " + flow);
+            PrintLn("\n** Max flow = " + flow +"\r\n\n");
 
             // min cut
-            PrintLn("\n** Min cut");
+            //PrintLn("\n** Min cut");
             FindMinCut(nodeSource);
         }
 
@@ -174,9 +169,9 @@ namespace AlgosProject
             foreach (var edge in minCutResult)
             {
                 maxflow += edge.Capacity;
-                PrintLn(edge.Info());
+               // PrintLn(edge.Info());
             }
-            PrintLn("min-cut total maxflow = " + maxflow);
+            //PrintLn("min-cut total maxflow = " + maxflow);
         }
 
         /*
@@ -258,12 +253,12 @@ namespace AlgosProject
         }
 
 
-        static void PrintNodes()
+        public void PrintNodes()
         {
             for (int i = 0; i < Nodes.Count; i++)
             {
                 var node = Nodes[i];
-                PrintLn(node.ToString() + " outnodes=" + node.GetInfo());
+                //PrintLn(node.ToString() + " outnodes=" + node.GetInfo());
             }
         }
 
@@ -329,8 +324,9 @@ namespace AlgosProject
             }
         }
 
-        public static void PrintLn(object o) { Console.WriteLine(o); } //alias
-        public static void PrintLn() { Console.WriteLine(); } //alias
-        public static void Print(object o) { Console.Write(o); } //alias
+        string output;
+        public void PrintLn(object o) { output += o.ToString(); } //alias
+        public void PrintLn() { } //alias
+        public void Print(object o) { output += o.ToString(); } //alias
     }
 }
