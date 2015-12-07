@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace AlgosProject
+namespace Musify.Algorithms
 {
     class BreadthFirstSearch
     {
@@ -107,19 +107,20 @@ namespace AlgosProject
             }
         }
 
-        static void Main(string[] args)
+        string output;
+        public string Run()
         {
             BreadthFirstAlgorithm BFS = new BreadthFirstAlgorithm();
             BFS_Device root = BFS.BFS_BuildDeviceGraph(); //Get Graph and Root
-            Console.WriteLine("Traverse\n------");
+            output += "\n\nBreadth First Search\n";
+            output += "Traverse\n";
             BFS.Traverse(root);
-            Console.WriteLine("\nSearch\n------");
-            BFS_Device p = BFS.Search(root, "Darshan");
-            Console.WriteLine(p == null ? "Device not found" : p.deviceName);
+            output += "\nSearch\n";
+            BFS_Device p = BFS.Search(root, "Nandha");
+            output += p == null ? "Device not found" : "Device " + p.deviceName + " found";
             //p = BFS.Search(root, "Derek");
             //Console.WriteLine(p == null ? "Device not found" : p.deviceName);
-
-            Console.ReadLine();
+            return output;
         }
     }
 }

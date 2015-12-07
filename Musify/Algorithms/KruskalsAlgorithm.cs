@@ -41,10 +41,11 @@ namespace Musify.Algorithms
             KruskalsAlgorithm mst = new KruskalsAlgorithm();
             Pair[] A = mst.MSTKruskal(9, adjacency);
 
-            output += "The edges of the minimum spanning tree:\r\n\r\n";
+            output += "The edges of the minimum spanning tree:\r\n";
             for (int i = 0; i < A.Length; i++)
                 if (A[i] != null)
                     output += A[i].ToString() + "\r\n";
+            output += "\r\n\n";
             return output;
         }
 

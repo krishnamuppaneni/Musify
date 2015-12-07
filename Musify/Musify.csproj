@@ -94,7 +94,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Algorithms\DFS.cs" />
+    <Compile Include="Algorithms\BreadthFirstSearch.cs" />
+    <Compile Include="Algorithms\DepthFirstSearch.cs" />
     <Compile Include="Algorithms\KruskalsAlgorithm.cs" />
     <Compile Include="Algorithms\NetworkFlowAlgorithm.cs" />
     <Compile Include="Algorithms\ShortestDelay.cs" />

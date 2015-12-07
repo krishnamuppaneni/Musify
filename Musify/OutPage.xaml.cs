@@ -27,6 +27,10 @@ namespace Musify
             outputText.Text += kruskal.Run();
             UnionFind unionFind = new UnionFind();
             outputText.Text += unionFind.Run();
+            DepthFirstSearch dfs = new DepthFirstSearch();
+            outputText.Text += dfs.Run();
+            BreadthFirstSearch bfs = new BreadthFirstSearch();
+            outputText.Text += bfs.Run();
         }
     }
 }

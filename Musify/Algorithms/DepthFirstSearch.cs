@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace AlgosProject
+namespace Musify.Algorithms
 {
     class DepthFirstSearch
     {
@@ -40,22 +40,19 @@ namespace AlgosProject
         {
             public Device_DFS BuildFriendGraph()
             {
-                Device_DFS Aaron = new Device_DFS("Aaron");
-                Device_DFS Betty = new Device_DFS("Betty");
-                Device_DFS Brian = new Device_DFS("Brian");
-                Aaron.DFS_AddDevice(Betty);
-                Aaron.DFS_AddDevice(Brian);
+                Device_DFS Krishna = new Device_DFS("Krishna");
+                Device_DFS Lakshman = new Device_DFS("Lakshman");
+                Device_DFS Aakash = new Device_DFS("Aakash");
+                Krishna.DFS_AddDevice(Lakshman);
+                Krishna.DFS_AddDevice(Aakash);
 
-                Device_DFS Catherine = new Device_DFS("Catherine");
-                Device_DFS Carson = new Device_DFS("Carson");
-                Device_DFS Darian = new Device_DFS("Darian");
-                Device_DFS Derek = new Device_DFS("Derek");
-                Betty.DFS_AddDevice(Catherine);
-                Betty.DFS_AddDevice(Darian);
-                Brian.DFS_AddDevice(Carson);
-                Brian.DFS_AddDevice(Derek);
+                Device_DFS Darshan = new Device_DFS("Darshan");
+                Device_DFS Nandha = new Device_DFS("Nandha");
 
-                return Aaron;
+                Lakshman.DFS_AddDevice(Darshan);
+                Lakshman.DFS_AddDevice(Nandha);
+
+                return Krishna;
             }
 
             public Device_DFS Search(Device_DFS root, string nameToSearchFor)
@@ -83,19 +80,19 @@ namespace AlgosProject
             }
         }
 
-        static void Main(string[] args)
+        string output;
+        public string Run()
         {
             DepthFirstAlgorithm b = new DepthFirstAlgorithm();
             Device_DFS root = b.BuildFriendGraph();
-            Console.WriteLine("Traverse\n------");
+            output += "\n\nDepth First Search";
+            output += "\n\nTraverse\n";
             b.Traverse(root);
 
-            Console.WriteLine("\nSearch\n------");
-            Device_DFS p = b.Search(root, "Catherine");
-            Console.WriteLine(p == null ? "Device_DFS not found" : p.name);
-            //p = b.Search(root, "Alex");
-            //Console.WriteLine(p == null ? "Device_DFS not found" : p.name);
-            Console.ReadLine();
+            output += "\nSearch\n";
+            Device_DFS p = b.Search(root, "Nandha");
+            output += p == null ? "Device_DFS not found" : "Device "+ p.name;+" found";
+            return output;
         }
     }
 }
