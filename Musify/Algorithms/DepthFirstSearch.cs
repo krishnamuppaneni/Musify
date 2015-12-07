@@ -91,7 +91,7 @@ namespace Musify.Algorithms
 
             output += "\nSearch\n";
             Device_DFS p = b.Search(root, "Nandha");
-            output += p == null ? "Device_DFS not found" : "Device "+ p.name;+" found";
+            output += p == null ? "Device_DFS not found" : "Device "+ p.name + " found";
             return output;
         }
     }
