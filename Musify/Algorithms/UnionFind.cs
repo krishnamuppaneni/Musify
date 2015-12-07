@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace AlgosProject
+namespace Musify.Algorithms
 {
     class UnionFind
     {
-        static void Main(string[] args)
+        public string output;
+
+        public string Run()
         {
             try
             {
@@ -21,35 +23,32 @@ namespace AlgosProject
                 sets.Union(sets.FindSet(2), sets.FindSet(5));
                 sets.Union(sets.FindSet(4), sets.FindSet(5));
                 PrintElementSets(sets);
-                //sets.Union(sets.FindSet(5), sets.FindSet(3));
-                //PrintElementSets(sets);
-                //sets.Union(sets.FindSet(1), sets.FindSet(3));
-                //PrintElementSets(sets);
-                //sets.Union(sets.FindSet(6), sets.FindSet(7));
-                //PrintElementSets(sets);
-                //sets.Union(sets.FindSet(8), sets.FindSet(9));
-                //PrintElementSets(sets);
-                //sets.Union(sets.FindSet(6), sets.FindSet(9));
-                ////PrintElementSets(sets);
-                ////sets.AddElements(3);
-                //PrintElementSets(sets);
-                //sets.Union(sets.FindSet(11), sets.FindSet(12));
-                //PrintElementSets(sets);
-                //sets.Union(sets.FindSet(9), sets.FindSet(10));
-                //PrintElementSets(sets);
-                //sets.Union(sets.FindSet(7), sets.FindSet(11));
-                //PrintElementSets(sets);
-                //Console.ReadLine();
+                sets.Union(sets.FindSet(6), sets.FindSet(7));
+                PrintElementSets(sets);
+                sets.Union(sets.FindSet(8), sets.FindSet(9));
+                PrintElementSets(sets);
+                sets.Union(sets.FindSet(6), sets.FindSet(9));
+                PrintElementSets(sets);
+                sets.AddElements(3);
+                PrintElementSets(sets);
+                sets.Union(sets.FindSet(11), sets.FindSet(12));
+                PrintElementSets(sets);
+                sets.Union(sets.FindSet(9), sets.FindSet(10));
+                PrintElementSets(sets);
+                sets.Union(sets.FindSet(7), sets.FindSet(11));
+                PrintElementSets(sets);
+                Console.ReadKey();
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.StackTrace);
+                //Console.WriteLine(e.StackTrace);
             }
+            return output;
         }
 
-        static void PrintElementSets(DisjointSets sets)
+        public void PrintElementSets(DisjointSets sets)
         {
-            for (int i = 1; i < sets.ElementCount; ++i)
+            for (int i = 0; i < sets.ElementCount; ++i)
                 Console.Write(sets.FindSet(i).ToString() + "  ");
             Console.WriteLine();
         }
