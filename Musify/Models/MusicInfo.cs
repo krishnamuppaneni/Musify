@@ -6,7 +6,7 @@ namespace Musify.Models
     [Table("MusicInfo")]
     public class MusicInfo
     {
-        [PrimaryKey]      
+        [PrimaryKey, AutoIncrement]      
         public int Id { get; set; }
 
         public string Name { get; set; }
@@ -14,7 +14,7 @@ namespace Musify.Models
         [ForeignKey(typeof(Device))]
         public int OwnerId { get; set; }
 
-        [OneToOne]
+        [ManyToOne(CascadeOperations = CascadeOperation.All)]
         public Device Owner { get; set; }
     }
 }

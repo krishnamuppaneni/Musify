@@ -1,16 +1,19 @@
 ﻿using SQLite.Net.Attributes;
+using SQLiteNetExtensions.Attributes;
+using System;
+using System.Collections.Generic;
 
 namespace Musify.Models
 {
     public class RouteTable
     {
-        [PrimaryKey]
-        public int Id { get; set; }
-      
+        [PrimaryKey, AutoIncrement]
         public int RouteId { get; set; }
 
-        public int Order { get; set; }
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
 
-        public string DisplayName { get; set; }
+        [OneToMany(CascadeOperations = CascadeOperation.All)]
+        public List<Connection> Connections { get; set; }
     }
 }

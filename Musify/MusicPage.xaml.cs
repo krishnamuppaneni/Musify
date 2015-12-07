@@ -2,11 +2,13 @@
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 using Microsoft.Phone.Tasks;
+using Musify.Algorithms;
 using Musify.Models;
 using Musify.Resources;
 using SQLite;
 using SQLite.Net;
 using SQLite.Net.Platform.WindowsPhone8;
+using SQLiteNetExtensions.Extensions;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -41,6 +43,7 @@ namespace Musify
         DataReader _dataReader;
         DataWriter _dataWriter1;
         DataReader _dataReader1;
+        int routeId;
 
         public MusicPage()
         {
@@ -63,12 +66,15 @@ namespace Musify
                 inputPrompt.Completed += (sender, o) =>
                 {
                     App.DisplayName = o.Result;
+                    displayName.DataContext = o.Result;
                 };
                 inputPrompt.Show();
             }
+            displayName.DataContext = App.DisplayName;
+
             using (var db = new SQLiteConnection(new SQLitePlatformWP8(), DatabaseHelper.DB_PATH))
             {
-                music = db.Table<MusicInfo>().ToList();
+                music = db.GetAllWithChildren<MusicInfo>().ToList();
                 musicList.DataContext = music;
             }
 
@@ -94,18 +100,22 @@ namespace Musify
 
         private async void musicList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            outputText.Text = "Music selected";
             if (musicList.SelectedItem == null)
                 return;
             MusicInfo music = (MusicInfo)e.AddedItems[0];
             StorageFolder folder = KnownFolders.MusicLibrary;
             if (music.Owner.DisplayName == App.DisplayName)
             {
+                outputText.Text = "Music is owned by this device";
                 StorageFile file = await folder.GetFileAsync(music.Name);
                 media.Source = new Uri(file.Path);
                 media.Play();
+                outputText.Text = "Playing music";
             }
             else
             {
+                outputText.Text = "Music is not owned by this device";
                 RequestMusic(music);
             }
             musicList.SelectedItem = null;
@@ -116,50 +126,68 @@ namespace Musify
             try
             {
                 StartProgress("finding peer...");
+                outputText.Text = "Finding peer";
                 var peers = await PeerFinder.FindAllPeersAsync();
                 if (peers.Count == 0)
                 {
                     ShowToastMessage("No peers are available to connect.");
+                    outputText.Text = "";
                 }
                 else
                 {
-                    List<RouteTable> routes;
+                    List<Device> routes;
                     PeerInformation peer;
-                    int routeId;
                     int sourceOrderId;
                     int destinationOrderId;
-                    using (var db = new SQLiteConnection(new SQLitePlatformWP8(),DatabaseHelper.DB_PATH))
+                    var db = new SQLiteConnection(new SQLitePlatformWP8(), DatabaseHelper.DB_PATH);
+                    ShortestDelay shortestDelay = new ShortestDelay();
+                    int startDeviceId = db.Table<Device>()
+                        .Where(d => d.DisplayName == App.DisplayName).FirstOrDefault().Id;
+                    int endDeviceId = db.Table<Device>()
+                        .Where(d => d.Id == music.OwnerId).FirstOrDefault().Id;
+                    outputText.Text = "Finding route using shortest path algorithm";
+                    routes = shortestDelay.FindMinDelayPath(db.FindWithChildren<Device>(startDeviceId, recursive: true),
+                        db.FindWithChildren<Device>(endDeviceId, recursive: true), 1);
+                    sourceOrderId = routes.Count - 1;
+                    destinationOrderId = sourceOrderId - 1;
+                    peer = peers.Where(p => p.DisplayName == routes[destinationOrderId].DisplayName).FirstOrDefault();
+                    outputText.Text = "Next device in route is " + peer.DisplayName;
+                    Device startDevice = db.FindWithChildren<Device>(startDeviceId, recursive: true);
+                    Device endDevice = db.FindWithChildren<Device>(endDeviceId, recursive: true);
+                    outputText.Text = "Checking if device " + peer.DisplayName + " is available";
+                    while (!await CheckExistance(peer))
                     {
-                        routes = db.Table<RouteTable>().ToList();
-                    }
-                    routeId = routes.Where(r1 => r1.DisplayName == App.DisplayName && routes.Where(r2 => r2.DisplayName == music.Owner.DisplayName && r1.RouteId == r2.RouteId).Count() > 0)
-                            .Select(s => s.RouteId).FirstOrDefault();
-                    sourceOrderId = routes.Where(r => r.DisplayName == App.DisplayName && r.RouteId == routeId).FirstOrDefault().Order;
-                    destinationOrderId = routes.Where(r => r.DisplayName == music.Owner.DisplayName && r.RouteId == routeId).FirstOrDefault().Order;
+                        outputText.Text = "The device " + peer.DisplayName + " is not available. Calculating new route";
+                        startDevice.Connections.RemoveAll(d => d.FirstDeviceId == routes[destinationOrderId].Id || d.SecondDeviceId == routes[destinationOrderId].Id);
+                        foreach (var connection in startDevice.Connections)
+                        {
+                            connection.FirstDevice.Connections.RemoveAll(d => d.FirstDeviceId == routes[destinationOrderId].Id || d.SecondDeviceId == routes[destinationOrderId].Id);
+                            connection.SecondDevice.Connections.RemoveAll(d => d.FirstDeviceId == routes[destinationOrderId].Id || d.SecondDeviceId == routes[destinationOrderId].Id);
+                        }
+                        endDevice.Connections.RemoveAll(d => d.FirstDeviceId == routes[destinationOrderId].Id || d.SecondDeviceId == routes[destinationOrderId].Id);
+                        foreach (var connection in endDevice.Connections)
+                        {
+                            connection.FirstDevice.Connections.RemoveAll(d => d.FirstDeviceId == routes[destinationOrderId].Id || d.SecondDeviceId == routes[destinationOrderId].Id);
+                            connection.SecondDevice.Connections.RemoveAll(d => d.FirstDeviceId == routes[destinationOrderId].Id || d.SecondDeviceId == routes[destinationOrderId].Id);
+                        }
 
-                    if (sourceOrderId > destinationOrderId)
-                    {
-                        peer = peers.Where(p => p.DisplayName == routes
-                        .Where(r => r.Order == sourceOrderId - 1).FirstOrDefault().DisplayName)
-                        .FirstOrDefault();
-                    }
-                    else
-                    {
-                        peer = peers.Where(p => p.DisplayName == routes
-                           .Where(r => r.Order == sourceOrderId + 1).FirstOrDefault().DisplayName)
-                           .FirstOrDefault();
-
+                        routes = shortestDelay.FindMinDelayPath(startDevice, endDevice, 1);
+                        sourceOrderId = routes.Count - 1;
+                        destinationOrderId = sourceOrderId - 1;
+                        peer = peers.Where(p => p.DisplayName == routes[destinationOrderId].DisplayName).FirstOrDefault();
                     }
                     if (peer != null)
                     {
                         using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())
                         {
-                            StartProgress("Getting music from " + _peerName + "...");
+                            StartProgress("Getting music from " + peer.DisplayName + "...");
                             byte[] musicBytes = await SendMusicRequest(music, peer);
                             using (IsolatedStorageFileStream audio = new IsolatedStorageFileStream(music.Name, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite, isf))
                             {
+                                outputText.Text = "Music received";
                                 audio.Write(musicBytes, 0, (Int32)musicBytes.Length);
                                 media.SetSource(audio);
+                                outputText.Text = "Playing Music";
                                 media.Play();
                                 media.MediaEnded += Media_MediaEnded;
                             }
@@ -169,7 +197,11 @@ namespace Musify
             }
             catch (Exception ex)
             {
-                if ((uint)ex.HResult == ERR_BLUETOOTH_OFF)
+                if (ex.HResult == -2146233086)
+                {
+                    MessageBox.Show("There is no path between source and destination due to inactive devices");
+                }
+                else if ((uint)ex.HResult == ERR_BLUETOOTH_OFF)
                 {
                     var result = MessageBox.Show(AppResources.Err_BluetoothOff, AppResources.Err_BluetoothOffCaption, MessageBoxButton.OKCancel);
                     if (result == MessageBoxResult.OK)
@@ -198,6 +230,20 @@ namespace Musify
             }
         }
 
+        private async Task<bool> CheckExistance(PeerInformation peer)
+        {
+            try
+            {
+                _socket = await PeerFinder.ConnectAsync(peer);
+                _peerName = peer.DisplayName;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
+        }
+
         private void Media_MediaEnded(object sender, RoutedEventArgs e)
         {
             (e.OriginalSource as MediaElement).Stop();
@@ -206,12 +252,13 @@ namespace Musify
 
         private async Task<byte[]> SendMusicRequest(MusicInfo music, PeerInformation peer)
         {
-            await ConnectToPeer(peer);
+            //await ConnectToPeer(peer);
             if (_socket == null)
             {
                 MessageBox.Show(AppResources.Err_NoPeerConnected, AppResources.Err_NoSendTitle, MessageBoxButton.OK);
                 return null;
             }
+            outputText.Text = "Sending Music request";
             _dataWriter = new DataWriter(_socket.OutputStream);
             _dataWriter.WriteInt32(music.Name.Length);
             await _dataWriter.StoreAsync();
@@ -223,6 +270,7 @@ namespace Musify
 
         private async Task<byte[]> GetMusic()
         {
+            outputText.Text = "Receiving music";
             _dataReader = new DataReader(_socket.InputStream);
             await _dataReader.LoadAsync(4);
             uint messageLen = (uint)_dataReader.ReadInt32();
@@ -275,7 +323,8 @@ namespace Musify
 
         private async void ListenForMusicRequest()
         {
-            StartProgress("Sending music to "+_peerName+"...");
+            StartProgress("Sending music to " + _peerName + "...");
+            outputText.Text = "Sending music to " + _peerName + "...";
             try
             {
                 string music = await GetMusicRequest();
@@ -302,7 +351,7 @@ namespace Musify
             MusicInfo musicInfo;
             using (var db = new SQLiteConnection(new SQLitePlatformWP8(), DatabaseHelper.DB_PATH))
             {
-                musicInfo = db.Table<MusicInfo>().Where(m => m.Name == music).FirstOrDefault();
+                musicInfo = db.GetAllWithChildren<MusicInfo>().Where(m => m.Name == music).FirstOrDefault();
             }
             if (musicInfo.Owner.DisplayName == App.DisplayName)
             {
@@ -322,6 +371,12 @@ namespace Musify
             else
             {
                 byte[] musicBytes = await RequestMusicForPeer(musicInfo);
+                if (musicBytes == null)
+                {
+                    StopProgress();
+                    return;
+                }
+
                 _dataWriter = new DataWriter(_socket.OutputStream);
                 _dataWriter.WriteInt32(musicBytes.Length);
                 await _dataWriter.StoreAsync();
@@ -345,41 +400,60 @@ namespace Musify
                 }
                 else
                 {
-                    List<RouteTable> routes;
+                    List<Device> routes;
                     PeerInformation peer;
-                    int routeId;
                     int sourceOrderId;
                     int destinationOrderId;
-                    using ( var db = new SQLiteConnection(new SQLitePlatformWP8(), DatabaseHelper.DB_PATH))
+                    var db = new SQLiteConnection(new SQLitePlatformWP8(), DatabaseHelper.DB_PATH);
+                    ShortestDelay shortestDelay = new ShortestDelay();
+                    int startDeviceId = db.Table<Device>()
+                         .Where(d => d.DisplayName == App.DisplayName).FirstOrDefault().Id;
+                    int endDeviceId = db.Table<Device>()
+                        .Where(d => d.Id == music.OwnerId).FirstOrDefault().Id;
+                    routes = shortestDelay.FindMinDelayPath(db.FindWithChildren<Device>(startDeviceId, recursive: true),
+                        db.FindWithChildren<Device>(endDeviceId, recursive: true), 1);
+                    sourceOrderId = routes.Count - 1;
+                    destinationOrderId = sourceOrderId - 1;
+                    peer = peers.Where(p => p.DisplayName == routes[destinationOrderId].DisplayName).FirstOrDefault(); Device startDevice = db.FindWithChildren<Device>(startDeviceId, recursive: true);
+                    Device endDevice = db.FindWithChildren<Device>(endDeviceId, recursive: true);
+                   while (!await CheckExistance(peer))
                     {
-                        routes = db.Table<RouteTable>().ToList();
-                    }
-                    routeId = routes.Where(r1 => r1.DisplayName == App.DisplayName && routes.Where(r2 => r2.DisplayName == music.Owner.DisplayName && r1.RouteId == r2.RouteId).Count() > 0)
-                            .Select(s => s.RouteId).FirstOrDefault();
-                    sourceOrderId = routes.Where(r => r.DisplayName == App.DisplayName && r.RouteId == routeId).FirstOrDefault().Order;
-                    destinationOrderId = routes.Where(r => r.DisplayName == music.Owner.DisplayName && r.RouteId == routeId).FirstOrDefault().Order;
+                        startDevice.Connections.RemoveAll(d => d.FirstDeviceId == routes[destinationOrderId].Id || d.SecondDeviceId == routes[destinationOrderId].Id);
+                        foreach (var connection in startDevice.Connections)
+                        {
+                            connection.FirstDevice.Connections.RemoveAll(d => d.FirstDeviceId == routes[destinationOrderId].Id || d.SecondDeviceId == routes[destinationOrderId].Id);
+                            connection.SecondDevice.Connections.RemoveAll(d => d.FirstDeviceId == routes[destinationOrderId].Id || d.SecondDeviceId == routes[destinationOrderId].Id);
+                        }
+                        endDevice.Connections.RemoveAll(d => d.FirstDeviceId == routes[destinationOrderId].Id || d.SecondDeviceId == routes[destinationOrderId].Id);
+                        foreach (var connection in endDevice.Connections)
+                        {
+                            connection.FirstDevice.Connections.RemoveAll(d => d.FirstDeviceId == routes[destinationOrderId].Id || d.SecondDeviceId == routes[destinationOrderId].Id);
+                            connection.SecondDevice.Connections.RemoveAll(d => d.FirstDeviceId == routes[destinationOrderId].Id || d.SecondDeviceId == routes[destinationOrderId].Id);
+                        }
 
-                    if (sourceOrderId > destinationOrderId)
-                    {
-                        peer = peers.Where(p => p.DisplayName == routes
-                        .Where(r => r.Order == sourceOrderId - 1).FirstOrDefault().DisplayName)
-                        .FirstOrDefault();
+                        routes = shortestDelay.FindMinDelayPath(startDevice, endDevice, 1);
+                        sourceOrderId = routes.Count - 1;
+                        destinationOrderId = sourceOrderId - 1;
+                        peer = peers.Where(p => p.DisplayName == routes[destinationOrderId].DisplayName).FirstOrDefault();
                     }
-                    else
-                    {
-                        peer = peers.Where(p => p.DisplayName == routes
-                           .Where(r => r.Order == sourceOrderId + 1).FirstOrDefault().DisplayName)
-                           .FirstOrDefault();
-
-                    }
-                    StartProgress("Getting music from "+_peerName+"...");
+                    //if (peer == null)
+                    //{
+                    //    StopProgress();
+                    //    ShowToastMessage("The Peer is not available to connect.");
+                    //    return null;
+                    //}
+                    StartProgress("Getting music from " + peer.DisplayName + "...");
                     byte[] musicBytes = await SendMusicRequestForPeer(music, peer);
                     return musicBytes;
                 }
             }
             catch (Exception ex)
             {
-                if ((uint)ex.HResult == ERR_BLUETOOTH_OFF)
+                if (ex.HResult == -2146233086)
+                {
+                    MessageBox.Show("There is no path between source and destination due to inactive devices");
+                }
+                else if((uint)ex.HResult == ERR_BLUETOOTH_OFF)
                 {
                     var result = MessageBox.Show(AppResources.Err_BluetoothOff, AppResources.Err_BluetoothOffCaption, MessageBoxButton.OKCancel);
                     if (result == MessageBoxResult.OK)

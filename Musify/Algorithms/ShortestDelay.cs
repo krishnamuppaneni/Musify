@@ -16,7 +16,6 @@ namespace Musify.Algorithms
         private List<Device> _cloud = new List<Device>();
         private ReachableDeviceList _reachableNodes = new ReachableDeviceList();
         private List<Device> _Devices = new List<Device>();
-        private List<Connection> _connections = new List<Connection>();
         private static List<Device> shortestRoute = new List<Device>();
         private SQLiteConnection db;
         private bool _isGraphConnected = true;
@@ -24,23 +23,20 @@ namespace Musify.Algorithms
         public ShortestDelay()
         {
             db = new SQLiteConnection(new SQLitePlatformWP8(), DatabaseHelper.DB_PATH);
-            FindMinDelayPath(db.FindWithChildren<Device>(1, recursive: true), db.FindWithChildren<Device>(5, recursive: true), 2);
         }
 
-        private void FindMinDelayPath(Device start, Device end, int routeId)
+        public List<Device> FindMinDelayPath(Device start, Device end, int routeId)
         {
             shortestRoute.Clear();
             _cloud.Clear();
             _reachableNodes.Clear();
-            _connections = db.Table<Connection>()
-                .Where(c => c.RouteId == 2).ToList();
             Device currentNode = start;
             currentNode.Visited = true;
             start.TotalCost = 0;
             _cloud.Add(currentNode);
             ReachableDevice currentReachableNode;
 
-            while (currentNode != end)
+            while (currentNode.Id != end.Id)
             {
                 AddReachableNodes(currentNode);
                 UpdateReachableNodesTotalCost(currentNode);
@@ -61,18 +57,15 @@ namespace Musify.Algorithms
                 //set the current node to the closest one from the cloud
                 currentNode = currentReachableNode.Device;
                 //set a pointer to the edge from where we came from
-                if (currentNode.Id == end.Id)
-                {
-                    end.ConnectionCameFrom = currentReachableNode.Connection;
-                }
                 currentNode.ConnectionCameFrom = currentReachableNode.Connection;
                 //mark the edge as visited
                 currentReachableNode.Connection.Visited = true;
 
                 _cloud.Add(currentNode);
             }
+            end.ConnectionCameFrom = currentNode.ConnectionCameFrom;
             currentNode = end;
-            while (currentNode.Id != start.Id && currentNode.Connections.Count != 0 && currentNode.ConnectionCameFrom != null)
+            while (currentNode.Id != start.Id && currentNode.ConnectionCameFrom != null)
             {
                 currentNode.Visited = true;
                 currentNode.ConnectionCameFrom.Visited = true;
@@ -80,7 +73,8 @@ namespace Musify.Algorithms
                 currentNode = GetNeighbour(currentNode, currentNode.ConnectionCameFrom);
             }
             if (currentNode != null)
-                shortestRoute.Add(currentNode);
+                shortestRoute.Add(currentNode);            
+            return shortestRoute;
         }
 
         private void AddReachableNodes(Device node)
@@ -91,7 +85,7 @@ namespace Musify.Algorithms
             {
                 neighbour = GetNeighbour(node, edge);
                 //make sure we don't add the node we came from
-                if (node.ConnectionCameFrom == null || neighbour != GetNeighbour(node, node.ConnectionCameFrom))
+                if (node.ConnectionCameFrom == null || neighbour.Id != GetNeighbour(node, node.ConnectionCameFrom).Id)
                 {
                     //make sure we don't add a node already in the cloud
                     if (!_cloud.Contains(neighbour))
@@ -119,7 +113,7 @@ namespace Musify.Algorithms
 
         private Device GetNeighbour(Device node, Connection edge)
         {
-            if (edge.FirstDevice == node)
+            if (edge.FirstDevice.Id == node.Id)
                 return edge.SecondDevice;
             else
                 return edge.FirstDevice;

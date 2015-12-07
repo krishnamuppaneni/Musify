@@ -38,9 +38,10 @@ namespace Musify.Models
             this._delay = delay;
         }
 
-        [PrimaryKey]
+        [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
 
+        [ForeignKey(typeof(RouteTable))]
         public int RouteId { get; set; }
 
         [ManyToOne(foreignKey: "FirstDeviceId", CascadeOperations = CascadeOperation.All)]

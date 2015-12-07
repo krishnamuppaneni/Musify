@@ -1,11 +1,13 @@
 ﻿<phone:PhoneApplicationPage
-    x:Class="Musify.MusicPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
     xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
+    xmlns:es="clr-namespace:Microsoft.Expression.Shapes;assembly=Microsoft.Expression.Drawing"
+    x:Class="Musify.MusicPage"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
@@ -23,13 +25,22 @@
         <!--TitlePanel contains the name of the application and page title-->
         <StackPanel Grid.Row="0" Margin="12,17,0,28">
             <TextBlock Text="Musify" Style="{StaticResource PhoneTextNormalStyle}"/>
-            <TextBlock Text="music list" Margin="9,-7,0,0" Style="{StaticResource PhoneTextTitle1Style}"/>
+            <TextBlock x:Name="displayName" Text="{Binding}" Margin="9,-7,0,0" Style="{StaticResource PhoneTextTitle1Style}"/>
         </StackPanel>
 
-        <!--ContentPanel - place additional content here-->
         <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
             <MediaElement x:Name="media"/>
-            <phone:LongListSelector x:Name="musicList" ItemsSource="{Binding}" FontFamily="Portable User Interface" SelectionChanged="musicList_SelectionChanged">
+            <ComboBox x:Name="ComboBoxMenu" HorizontalAlignment="Left" Height="71"   
+				VerticalAlignment="Top"   
+       >
+                <ComboBoxItem Content="Graph 1"  Tag="1" IsSelected="True"/>
+                <ComboBoxItem Content="Graph 2" Tag="2"/>
+            </ComboBox>
+            <phone:LongListSelector Visibility="Collapsed" x:Name="musicList" ItemsSource="{Binding}" Grid.Row="1" FontFamily="Portable User Interface" SelectionChanged="musicList_SelectionChanged">
                 <phone:LongListSelector.ItemTemplate>
                     <DataTemplate>
                         <Grid Margin="10">
@@ -38,11 +49,39 @@
                                 <RowDefinition Height="auto"/>
                             </Grid.RowDefinitions>
                             <TextBlock Text="{Binding Name}" FontSize="24" FontWeight="Bold" Margin="0,0,0,5"/>
-                            <TextBlock Text="{Binding Owner}" Grid.Row="1"/>
+                            <TextBlock Text="{Binding Owner.DisplayName}" Grid.Row="1"/>
                         </Grid>
                     </DataTemplate>
                 </phone:LongListSelector.ItemTemplate>
             </phone:LongListSelector>
+            <Grid Grid.Row="1">
+                <Ellipse Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="100" Margin="0,62,0,0" Grid.Row="1" Stroke="Black" VerticalAlignment="Top" Width="100"/>
+                <Ellipse Fill="#FFF4F4F5" Height="100" Margin="169,62,187,0" Stroke="Black" VerticalAlignment="Top"/>
+                <Ellipse Fill="#FFF4F4F5" HorizontalAlignment="Left" Margin="0,228,0,208" Stroke="Black" Width="100"/>
+                <Ellipse Fill="#FFF4F4F5" Margin="169,228,187,208" Stroke="Black" d:LayoutOverrides="LeftPosition, RightPosition, TopPosition, BottomPosition"/>
+                <Ellipse Fill="#FFF4F4F5" HorizontalAlignment="Right" Margin="0,143,10,0" Stroke="Black" Width="100" Height="100" VerticalAlignment="Top"/>
+                <Line Fill="White" Stroke="White" StrokeThickness="5" X1="100" X2="170" Y1="110" Y2="110" />
+                <TextBlock Text="2" Margin="126,79,-126,-79"/>
+                <Line Fill="White" Stroke="White" StrokeThickness="5" X1="100" X2="170" Y1="280" Y2="280" />
+                <TextBlock Text="1" Margin="126,248,-126,-248"/>
+                <Line Fill="White" Stroke="White" StrokeThickness="5" X1="220" X2="220" Y1="160" Y2="230" />
+                <TextBlock Text="2" Margin="201,187,-201,-187"/>
+                <Line Fill="White" Stroke="White" StrokeThickness="5" X1="345" X2="265" Y1="190" Y2="280" />
+                <TextBlock Text="1" Margin="298,206,-298,-206"/>
+                <Line Fill="White" Stroke="White" StrokeThickness="5" X1="345" X2="265" Y1="190" Y2="120" />
+                <TextBlock Text="4" Margin="311,121,-311,-121"/>
+                <Line Fill="White" Stroke="White" StrokeThickness="5" X1="50" X2="50" Y1="160" Y2="230" />
+                <TextBlock Text="1" Margin="39,184,-39,-184"/>
+                <Line Fill="White" Stroke="White" StrokeThickness="5" X1="185" X2="85" Y1="145" Y2="245" />
+                <TextBlock Text="4" Margin="105,167,-105,-167"/>
+                <TextBlock Text="A" Margin="39,99,-39,-99" Foreground="Black"/>
+                <TextBlock Text="B" Margin="215,99,-215,-99" Foreground="Black"/>
+                <TextBlock Text="C" Margin="39,263,-39,-263" Foreground="Black"/>
+                <TextBlock Text="D" Margin="215,263,-215,-263" Foreground="Black"/>
+                <TextBlock Text="E" Margin="388,184,-388,-184" Foreground="Black"/>
+            </Grid>
+            <TextBlock x:Name="outputText" Grid.RowSpan="3" Text="Test" Foreground="White" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,20" FontSize="24"/>
+
         </Grid>
     </Grid>
 
